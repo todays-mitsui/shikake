@@ -2,98 +2,56 @@ require 'bundler'
 Bundler.require
 
 
-#class Shikake
-#	attr_accessor :url
-#	@@opts = {:skip_query_strings => true}
-#
-#	def initialize url
-#		@url = url
-#	end
-#
-#	def crawl_ga_tag crawler
-#		result = []
-#		crawler.skip_links_like /(\.jpe?g|\.gif|\.png|\.pdf)$/
-#		crawler.on_every_page do |page|
-#			tags = []
-#			if page.doc
-#				tags.push(pick_ga_tag page) if pick_ga_tag page
-#				tags.push(pick_univ_tag page) if pick_univ_tag page
-#				result.push({:url => page.url, :tags => tags})
-#			end
-#		end
-#		result
-#	end
-#
-#	def pick_ga_tag page
-#		r = /(\[_setAccount.+(UA-\d+-\d+).+\])/
-#		page.doc.css("script").each do |el|
-#			return {tag: "ga", id: $2} if r.match(el.text)
-#		end
-#		return nil
-#	end
-#
-#	def pick_univ_tag page
-#		r = /(ga\s*\(\s*('create'|"create").*(UA-\d+-\d+).+;)/
-#		page.doc.css("script").each do |el|
-#			return {tag: "univ", id: $3} if r.match(el.text)
-#		end
-#		return nil
-#	end
-#
-#	def show_result pages
-#		puts "\nresult:"
-#		puts "\n  #{pages.length} pages."
-#		pages_ = pages.map {|page| page[:tags]}
-#		tags = pages_.flatten.compact.uniq
-#		puts "  #{tags.length} tags exist."
-#		puts "\n  tags:"
-#		tags.each {|tag| puts "    #{tag.to_s}"}
-#		pages.each {|page| puts "  !!No tags in #{page[:url]}" if page[:tags].empty?}
-#		puts "\ndone."
-#	end
-#
-#	def crawlGA
-#		result = nil
-#		puts "crawling #{@url}..."
-#		Anemone.crawl(@url, @@opts) do |crawler|
-#			p crawler.class
-#			result = crawl_ga_tag crawler
-#		end
-#		show_result result
-#	end
-#end
-
-class Shikake2
-	attr_reader :url, :opts
-
-	def initialize(url)
-		@url = url
-		@opts = {}
-		set_opts({skip_query_strings: true})
+class Shikake < Anemone::Core
+	def initialize url
+		super
+		@opts = {
+			:skip_query_strings => true,
+			:skip_link_patterns => [/\.jpe?g$/i, /\.gif$/i, /.png$/i, /\.pdf$/i]
+		}
 	end
 
-	def scan_tag
-		Anemone.crawl(@url, @opts, &shikake)
+	def scan
+		on_every_page &scan_atag
+		@start_time = Time.now.to_i
+		run
+		@end_time = Time.now.to_i
+		puts "#{@end_time - @start_time}秒かかりました。"
+		@scan_result
 	end
 
-	def set_opts opt
-		@opts.merge! opt
-	end
-
-	private
-
-		def shikake
-			lambda{|crawler| 
-				crawler.skip_links_like /(\.jpe?g|\.gif|\.png|\.pdf)$/
-				crawler.on_every_page do |page|
-					puts page.url if page.doc
-				end
-			}
+	def scan_atag
+		@scan_result = Atags.new
+		lambda do |page|
+			@scan_result.push(page.url, page.atags) if page.doc
+			#if page.doc
+			#	a = page.atags
+			#	puts page.url
+			#	p a
+			#	@scan_result.push(page.url, a)
+			#end
 		end
-end
+	end
 
-s2 = Shikake2.new("http://www.city.fukuoka.lg.jp/")
-s2.scan_tag
+	class Anemone::Page
+		@atags = false
+
+		def atags
+			find_atag unless @atags
+			@atags
+		end
+
+		def find_atag
+			r_ga = /(\[_setAccount.+(UA-\d+-\d+).+\])/
+			r_univ = /(ga\s*\(\s*('create'|"create").*(UA-\d+-\d+).+;)/
+			@atags = []
+			@doc.css("script").each do |el|
+				@atags << {kind: :univ, id: $3} if r_univ.match(el.text)
+				@atags << {kind: :ga, id: $2} if r_ga.match(el.text)
+			end
+		end
+	end
+end
 
 class Atags
 	def initialize
@@ -121,9 +79,9 @@ class Atags
 		tags.map{|tag| tag[:id]}.uniq
 	end
 	
-	def push(url, kind = nil, id = nil)
-		if kind && id
-			stock_tag(url, kind, id)
+	def push(url, tags)
+		if tags && !tags.empty?
+			stock_tag(url, tags)
 		else
 			stock_no_tag(url)
 		end
@@ -131,11 +89,11 @@ class Atags
 
 	private
 
-		def stock_tag(url, kind, id)
+		def stock_tag(url, tags)
 			if @tag_pages.include?(url)
-				@tag_pages[url] << ({:kind => kind, :id => id})
+				@tag_pages[url] += tags
 			else
-				@tag_pages[url] = [] << {:kind => kind, :id => id}
+				@tag_pages[url] = tags
 			end
 		end
 
@@ -144,18 +102,11 @@ class Atags
 		end
 end
 
-tags = Atags.new
-tags.push("a", :a, 1)
-tags.push("b", nil, 2)
-tags.push("a", :c, nil)
-tags.push("d", :d, 4)
-p tags
-p tags.pages
-p tags.tag_pages
-p tags.no_tag_pages
-p tags.tags
-p tags.tag_ids
-
-#shi = Shikake.new("http://marimo-dental.com/")
-#shi.crawlGA
-
+if ARGV[0]
+	shikake = Shikake.new(ARGV[0])
+	scan_result = shikake.scan
+	puts "all pages:    #{scan_result.pages.length} pages"
+	puts "tag pages:    #{scan_result.tag_pages.length} pages"
+	puts "no tag pages: #{scan_result.no_tag_pages.length} pages"
+	puts "tags:         #{scan_result.tags}"
+end
