@@ -42,7 +42,7 @@ class Shikake < Anemone::Core
 		end
 
 		def find_atag
-			r_ga = /(\[_setAccount.+(UA-\d+-\d+).+\])/
+			r_ga = /(\[.*_setAccount.+(UA-\d+-\d+).+\])/
 			r_univ = /(ga\s*\(\s*('create'|"create").*(UA-\d+-\d+).+;)/
 			@atags = []
 			@doc.css("script").each do |el|
