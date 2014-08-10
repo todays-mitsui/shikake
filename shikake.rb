@@ -105,8 +105,17 @@ end
 if ARGV[0]
 	shikake = Shikake.new(ARGV[0])
 	scan_result = shikake.scan
-	puts "all pages:    #{scan_result.pages.length} pages"
-	puts "tag pages:    #{scan_result.tag_pages.length} pages"
-	puts "no tag pages: #{scan_result.no_tag_pages.length} pages"
-	puts "tags:         #{scan_result.tags}"
+	result = <<-EOD
+url:          #{ARGV[0]}
+all pages:    #{scan_result.pages.length} pages
+tag pages:    #{scan_result.tag_pages.length} pages
+no tag pages: #{scan_result.no_tag_pages.length} pages
+tags:         #{scan_result.tags}
+	EOD
+	puts result
+	File.open("log/scan_result.txt", "w+") do |file|
+		file.write result
+		file.write "\n"
+		file.write scan_result.no_tag_pages.join("\n")
+	end
 end
