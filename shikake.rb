@@ -3,6 +3,11 @@ Bundler.require
 
 
 class Shikake < Anemone::Core
+
+	@@regexps = {
+		:sp => %r*(/sp/|/sp$)*
+	}
+
 	def initialize url
 		super
 		@opts = {
@@ -19,11 +24,13 @@ class Shikake < Anemone::Core
 	end
 
 	def scan
+		focus_crawl &set_focus
 		on_pages_like /(\.html?|\.php|\/)$/, &scan_tag
-		#on_every_page &scan_atag
+
 		@start_time = Time.now.to_i
 		run
 		@end_time = Time.now.to_i
+
 		puts "#{@end_time - @start_time}秒かかりました。"
 		@scan_result
 	end
@@ -33,6 +40,22 @@ class Shikake < Anemone::Core
 		lambda do |page|
 			@scan_result.push(page.url, page.doc.title, page.tags) if page.doc
 		end
+	end
+
+	def set_focus
+		lambda do |page|
+			page.links.keep_if do |link|
+				if sp?
+					link.to_s.match(@@regexps[:sp])
+				else
+					!link.to_s.match(@@regexps[:sp])
+				end
+			end
+		end
+	end
+
+	def sp?
+		@urls.any? {|url| @@regexps[:sp].match(url.to_s)}
 	end
 
 	class Anemone::Page
@@ -47,7 +70,7 @@ class Shikake < Anemone::Core
 			r_ga_old = /(\[.*_setAccount.+(UA-\d+-\d+).+\])/i
 			r_ga_new = /(ga\s*\(\s*('create'|"create").*(UA-\d+-\d+).+;)/i
 			r_event_old = /_?gaq.push\s*\(\s*(\[('_trackEvent'|"_trackEvent").*\])\s*\)/i
-			r_event_new = /ga\s*\(('send'|"send").*,.*('event'|"event").*\)/i
+			r_event_new = /(ga\s*\(('send'|"send").*,.*('event'|"event").*\))/i
 			r_callcv_old = /_?gaq.push\s*\(\s*(\[('_trackPageview'|"_trackPageview").*\])\s*\)/i
 			r_callcv_new = /ga\s*(\(('send'|"send").*,.*('pageview'|"pageview").*\))/i
 			@tags = Hash.new {|hash, key| hash[key] = []}
