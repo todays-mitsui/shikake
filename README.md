@@ -1,1 +1,4 @@
-師曰く、「README.mdは後で書く」。
+# 菴ｿ縺�譁ｹ #
+  
+1. start.bat繧偵ム繝悶Ν繧ｯ繝ｪ繝�繧ｯ縺励※
+2. ruby shikake.rb http://www.example.com

@@ -137,10 +137,16 @@ class Atags
 	end
 
 	def ga_tags_url
-		@tags.map{|url, val| url if val[:ga]}.compact
+		@tags.map do |url, val|
+			url if val[:ga]
+			#"#{url}\n#{val[:ga]}" if val[:ga]
+		end.compact
 	end
 	def no_univ_tags_url
-		@tags.map{|url, val| url if !val[:univ]}.compact
+		@tags.map do |url, val|
+			url if !val[:univ]
+			#"#{url}\n#{val[:univ]}" if !val[:univ]
+		end.compact
 	end
 	def event_old_tags_url
 		@tags.map{|url, val| "url: #{url}\ntag: #{val[:event_old].map{|tag| tag[:tag]}}\n" if val[:event_old]}.compact
