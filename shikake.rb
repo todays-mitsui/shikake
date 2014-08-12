@@ -6,7 +6,8 @@ class Shikake < Anemone::Core
 
 	@@regexps = {
 		:sp => %r{(/sp/|/sp$)},
-		:img => %r{(/img/|/upimg/)}
+		:img_dir => %r{(/img/|/upimg/)},
+		:img_file => %r{(\.jpe?g$|\.gif$|\.png$|\.pdf$)}
 	}
 	@@tmp_path = "tmp/tmp_#{(0...8).map{(65+rand(26)).chr}.join}.txt"
 
@@ -14,7 +15,6 @@ class Shikake < Anemone::Core
 		super
 		@opts = {
 			:skip_query_strings => true,
-			:skip_link_patterns => [/\.jpe?g$/i, /\.gif$/i, /.png$/i, /\.pdf$/i, %r|/upimg/|],
 			:delay => 0.5,
 			:storage => Anemone::Storage.PStore(@@tmp_path),
 			:verbose => true
@@ -47,7 +47,9 @@ class Shikake < Anemone::Core
 
 	def set_focus
 		lambda do |page|
-			page.links.keep_if {|link| !link.to_s.match(@@regexps[:img])}
+			page.links.keep_if do |link|
+				!(link.to_s.match(@@regexps[:img_dir]) || link.to_s.match(@@regexps[:img_file]))
+			end
 			page.links.keep_if do |link|
 				if sp?
 					link.to_s.match(@@regexps[:sp])
