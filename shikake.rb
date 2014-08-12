@@ -5,7 +5,8 @@ Bundler.require
 class Shikake < Anemone::Core
 
 	@@regexps = {
-		:sp => %r*(/sp/|/sp$)*
+		:sp => %r{(/sp/|/sp$)},
+		:img => %r{(/img/|/upimg/)}
 	}
 
 	def initialize url
@@ -44,6 +45,7 @@ class Shikake < Anemone::Core
 
 	def set_focus
 		lambda do |page|
+			page.links.keep_if {|link| !link.to_s.match(@@regexps[:img])}
 			page.links.keep_if do |link|
 				if sp?
 					link.to_s.match(@@regexps[:sp])
