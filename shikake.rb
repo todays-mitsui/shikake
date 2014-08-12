@@ -163,8 +163,8 @@ class Atags
 		tags.each do |kind, val|
 			@tags[url][kind] = [] unless @tags[url][kind]
 			@tags[url][kind] += val
-			@tags[url][:title] = title
 		end
+		@tags[url][:title] = title
 	end
 end
 
