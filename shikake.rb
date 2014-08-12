@@ -8,6 +8,7 @@ class Shikake < Anemone::Core
 		:sp => %r{(/sp/|/sp$)},
 		:img => %r{(/img/|/upimg/)}
 	}
+	@@tmp_path = "tmp/tmp_#{(0...8).map{(65+rand(26)).chr}.join}.txt"
 
 	def initialize url
 		super
@@ -15,6 +16,7 @@ class Shikake < Anemone::Core
 			:skip_query_strings => true,
 			:skip_link_patterns => [/\.jpe?g$/i, /\.gif$/i, /.png$/i, /\.pdf$/i, %r|/upimg/|],
 			:delay => 0.5,
+			:storage => Anemone::Storage.PStore(@@tmp_path),
 			:verbose => true
 		}
 		if %r|/sp/|.match(url) || %r|/sp$|.match(url)
@@ -169,6 +171,8 @@ root_url = ARGV[0]
 if root_url
 	filename = root_url.gsub(/[\\\/:*?"<>|]/, "").gsub(/^https?/, "")
 	filepath = "log/#{filename}.txt"
+
+	FileUtils.mkdir_p("tmp/") unless FileTest.exist?("tmp/")
 
 	shikake = Shikake.new(root_url)
 	scan_result = shikake.scan
