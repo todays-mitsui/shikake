@@ -11,6 +11,11 @@ class Shikake < Anemone::Core
 			:delay => 0.5,
 			:verbose => true
 		}
+		if %r|/sp/|.match(url) || %r|/sp$|.match(url)
+			@opts[:user_agent] = "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25"
+		else
+			@opts[:user_agent] = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.63 Safari/537.36"
+		end
 	end
 
 	def scan
