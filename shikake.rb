@@ -113,10 +113,6 @@ class Atags
 		define_method "no_#{kind}_pages" do
 			@tags.select{|key, val| !val[kind] || val[kind].empty?}.keys
 		end
-
-		#define_method "#{kind}_tags" do
-		#	@tags.map{|key, val| val[kind] unless !val[kind] || val[kind].empty?}.compact.uniq
-		#end
 	end
 
 	def ga_tags
@@ -179,6 +175,8 @@ if root_url
 	shikake = Shikake.new(root_url)
 	scan_result = shikake.scan
 	result = <<-EOD
+date:               #{DateTime.now.strftime "%Y-%m-%d %H:%M:%S"}
+
 url:                #{root_url}
 all pages:          #{scan_result.pages.length} pages
 
