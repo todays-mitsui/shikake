@@ -1,27 +1,32 @@
 module Shikake
 	class Profile
-		def initialize
-			@profile = {}
+		def initialize profile={}
+			@profile = profile
 		end
 
 		def to_s
 			@profile.to_s
 		end
 
+		def length
+			@profile.length
+		end
+
 		def [] url
-			@profile[url]
+			@profile[url.to_sym]
 		end
 
 		def []= url,hash
 			@profile[url] = {} unless @profile[url]
 			hash.each do |key,val|
+				key = key.to_sym
 				case key
 					when :title
 						@profile[url][:title] = val
 					else
 						@profile[url][key] = [] unless @profile[url][key].instance_of?(Array)
 						@profile[url][key].push(val).flatten!
-					end
+				end
 			end
 		end
 
@@ -43,6 +48,23 @@ module Shikake
 
 		def values key
 			@profile.map{|url,prof| prof[key]}.flatten.compact.uniq
+		end
+
+		def map(*args)
+			@profile.inject({}) do |memo,(url,prof)|
+				if args.empty?
+					memo[url] = yield(url,prof)
+				else
+					key = args.first.to_sym
+					return memo unless prof.include? key
+					if block_given?
+						memo[url] = yield(prof[key]) 
+					else
+						memo[url] = prof[key]
+					end
+				end
+				memo
+			end
 		end
 	end
 end

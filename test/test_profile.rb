@@ -10,6 +10,10 @@ class TestProfile < MiniTest::Unit::TestCase
 		@prof["url/with/links"] = {:title => "title_url/with/links", :links => ["link01", "link02"], :score => [2, 3]}
 	end
 
+	def teardown
+		@prof = nil
+	end
+
 	def test_select
 		assert_equal ["url/with/tags"], @prof.select(:tags).keys
 	end
@@ -26,8 +30,20 @@ class TestProfile < MiniTest::Unit::TestCase
 		assert_equal ["url/with/tags", "url/with/links"], @prof.reject(:empty_prop).keys
 	end
 
+	def test_dichotomized
+		assert_equal @prof.length, (@prof.select(:tags).length + @prof.reject(:tags).length)
+	end
+
 	def test_values
 		assert_equal ["title_url/with/tags",  "title_url/with/links"], @prof.values(:title)
 		assert_equal [3, 2, 1].sort, @prof.values(:score).sort
+	end
+
+	def test_map
+		assert_equal true, ({"url/with/tags" => [1, 2], "url/with/links" => [2, 3]} == @prof.map(:score))
+	end
+
+	def test_map_with_block
+		assert_equal true, ({"url/with/tags" => [1, 4], "url/with/links" => [4, 9]} == (@prof.map(:score) {|scores| scores.map {|score| score * score}}))
 	end
 end
