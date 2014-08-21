@@ -24,5 +24,25 @@ module Shikake
 					end
 			end
 		end
+
+
+		def select key
+			@profile.select do |url,prof|
+				is_key_exist = prof.include?(key) && !prof[key].empty?
+				!block_given? || yield(prof[key]) if is_key_exist
+			end
+		end
+
+		def reject key
+			@profile.reject do |url,prof|
+				is_key_exist = prof.include?(key) && !prof[key].empty?
+				!block_given? || yield(prof[key]) if is_key_exist
+			end
+		end
+
+
+		def values key
+			@profile.map{|url,prof| prof[key]}.flatten.compact.uniq
+		end
 	end
 end
