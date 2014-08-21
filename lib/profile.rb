@@ -8,6 +8,10 @@ module Shikake
 			@profile.to_s
 		end
 
+		def [] url
+			@profile[url]
+		end
+
 		def []= url,hash
 			@profile[url] = {} unless @profile[url]
 			hash.each do |key,val|
