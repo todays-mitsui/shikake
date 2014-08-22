@@ -7,11 +7,13 @@ require './lib/spider'
 
 REGEXP = {
 	:ga        => /(\[.*_setAccount.+(UA-\d+-\d+).+\])/i,
-	:univ      => /(ga\s*\(\s*('create'|"create").*(UA-\d+-\d+).+;)/i,
+	:univ      => /(ga\s*\(\s*('create'|"create").*(UA-\d+-\d+).+;)/im,
+	:disp_feat => /ga\s*\(\s*('require'|"require")\s*,\s*('displayfeatures'|"displayfeatures")\s*\)/i,
 	:old_event => /_?gaq.push\s*\(\s*(\[('_trackEvent'|"_trackEvent").*\])\s*\)/i,
 	:new_event => /(ga\s*\(('send'|"send").*,.*('event'|"event").*\))/i,
 	:old_pv    => /_?gaq.push\s*\(\s*(\[('_trackPageview'|"_trackPageview").*\])\s*\)/i,
-	:new_pv    => /ga\s*(\(('send'|"send").*,.*('pageview'|"pageview").*\))/i
+	:new_pv    => /ga\s*(\(('send'|"send").*,.*('pageview'|"pageview").*\))/i,
+	:ytm       => %r{"//s\.yjtag\.jp/tag\.js#(site=[^"]+)"},
 }
 
 spider = Shikake::Spider.new(ARGV[0])
@@ -20,42 +22,49 @@ spider.train(:ga ,{
 	:selector => "script",
 	:before => lambda{|el| el.text},
 	:regexp => REGEXP[:ga],
-	:val => lambda{|md| "id: #{md[2]}"}
+	:val => lambda{|el,md| "id: #{md[2]}"}
 })
 spider.train(:univ ,{
 	:name => "UniversalAnalytics",
 	:selector => "script",
 	:before => lambda{|el| el.text},
 	:regexp => REGEXP[:univ],
-	:val => lambda{|md| "id: #{md[3]}, displayfeatures: YES"}
+	:val => lambda{|el,md| "id: #{md[3]}, displayfeatures: #{el.text.match(REGEXP[:disp_feat]) ? 'YES' : 'NO'}"}
 })
 spider.train(:old_event ,{
 	:name => "OldTrackEvent",
 	:selector => "a",
 	:before => lambda{|el| el.attribute("onclick")},
 	:regexp => REGEXP[:old_event],
-	:val => lambda{|md| "id: #{md[1]}"}
+	:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
 })
 spider.train(:new_event ,{
 	:name => "NewTrackEvent",
 	:selector => "a",
 	:before => lambda{|el| el.attribute("onclick")},
 	:regexp => REGEXP[:new_event],
-	:val => lambda{|md| "id: #{md[1]}"}
+	:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
 })
 spider.train(:old_pv ,{
 	:name => "OldTrackPageview",
 	:selector => "a",
 	:before => lambda{|el| el.attribute("onclick")},
 	:regexp => REGEXP[:old_pv],
-	:val => lambda{|md| "id: #{md[1]}"}
+	:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
 })
 spider.train(:new_pv ,{
 	:name => "NewTrackPageview",
 	:selector => "a",
 	:before => lambda{|el| el.attribute("onclick")},
 	:regexp => REGEXP[:new_pv],
-	:val => lambda{|md| "id: #{md[1]}"}
+	:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
+})
+spider.train(:ytm ,{
+	:name => "Yahoo!TagManager",
+	:selector => "script",
+	:before => lambda{|el| el.text},
+	:regexp => REGEXP[:ytm],
+	:val => lambda{|el,md| "id: #{md[1]}"}
 })
 spider.scan.show
 
