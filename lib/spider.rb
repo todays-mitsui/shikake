@@ -103,8 +103,8 @@ module Shikake
 				result = []
 				page.doc.css(selector).each do |el|
 					target = before_factory.call(el)
-					val = target.to_s.match(regexp, &after_factory) if target
-					result << val if val
+					md = target.to_s.match(regexp) if target
+					result << after_factory.call(el,md) if md
 				end
 				result
 			end
