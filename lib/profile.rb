@@ -1,6 +1,6 @@
 module Shikake
 	class Profile
-		attr_accessor :start, :done, :root_url
+		attr_accessor :start, :done, :root_url, :kinds
 
 		def initialize profile={}
 			@profile = profile

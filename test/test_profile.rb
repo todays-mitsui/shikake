@@ -49,6 +49,7 @@ class TestProfile < MiniTest::Unit::TestCase
 
 	def test_find_all
 		p @prof.find_all /tag/
+		puts @prof.instance_variables
 		#assert @prof.find_all(/01/)
 	end
 end

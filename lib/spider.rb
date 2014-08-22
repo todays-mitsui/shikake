@@ -13,6 +13,7 @@ module Shikake
 				[%r{(\.jpe?g$|\.gif$|\.png$|\.pdf$)}i, false]
 			]
 			@regexp = []
+			@kinds = []
 			@blueprint = Hash.new
 			@tmp_path = "tmp/tmp_#{(0...8).map{(65+rand(26)).chr}.join}.txt"
 			@opts.merge!({
@@ -31,6 +32,7 @@ module Shikake
 			on_pages_like(%r{\.html?$}, %r{\.php$}, %r{/$}, &crawl)
 
 			@prof = Shikake::Profile.new
+			@prof.kinds = @kinds
 			@prof.root_url = @root_url
 			@prof.start = Time.now
 			run
@@ -38,8 +40,9 @@ module Shikake
 			@prof
 		end
 
-		def train tag_name, blueprint
-			@blueprint[tag_name] = blueprint
+		def train tag_id, blueprint
+			@kinds << [tag_id.to_sym, blueprint[:name]] 
+			@blueprint[tag_id] = blueprint
 		end
 
 		def crawl
@@ -60,7 +63,7 @@ module Shikake
 				#@ignore_url << [%r{(/sp/|/sp$)}, true]
 			else
 				@opts[:user_agent] = USER_AGENT[:pc]
-				#@ignore_url << [%r{(/sp/|/sp$)}, false]
+				@ignore_url << [%r{(/sp/|/sp$)}, false]
 			end
 		end
 
@@ -95,7 +98,7 @@ module Shikake
 				result = []
 				page.doc.css(selector).each do |el|
 					target = before_factory.call(el)
-					match_data = target.match(regexp)
+					match_data = target.to_s.match(regexp) if target
 					result << after_factory.call(match_data) if match_data
 				end
 				result

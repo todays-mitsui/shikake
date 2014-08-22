@@ -2,14 +2,19 @@ require 'bundler'
 Bundler.require
 
 require './lib/profile'
+require './lib/profile_print'
 require './lib/spider'
 
 REGEXP = {
-	:ga => /(\[.*_setAccount.+(UA-\d+-\d+).+\])/i,
-	:univ => /(ga\s*\(\s*('create'|"create").*(UA-\d+-\d+).+;)/i
+	:ga        => /(\[.*_setAccount.+(UA-\d+-\d+).+\])/i,
+	:univ      => /(ga\s*\(\s*('create'|"create").*(UA-\d+-\d+).+;)/i,
+	:old_event => /_?gaq.push\s*\(\s*(\[('_trackEvent'|"_trackEvent").*\])\s*\)/i,
+	:new_event => /(ga\s*\(('send'|"send").*,.*('event'|"event").*\))/i,
+	:old_pv    => /_?gaq.push\s*\(\s*(\[('_trackPageview'|"_trackPageview").*\])\s*\)/i,
+	:new_pv    => /ga\s*(\(('send'|"send").*,.*('pageview'|"pageview").*\))/i
 }
 
-spider = Shikake::Spider.new("")
+spider = Shikake::Spider.new(ARGV[0])
 spider.train(:ga ,{
 	:name => "GoogleAnalytics",
 	:selector => "script",
@@ -24,7 +29,36 @@ spider.train(:univ ,{
 	:regexp => REGEXP[:univ],
 	:val => lambda{|md| "id: #{md[3]}, displayfeatures: YES"}
 })
-p spider.scan
+spider.train(:old_event ,{
+	:name => "OldTrackEvent",
+	:selector => "a",
+	:before => lambda{|el| el.attribute("onclick")},
+	:regexp => REGEXP[:old_event],
+	:val => lambda{|md| "id: #{md[1]}"}
+})
+spider.train(:new_event ,{
+	:name => "NewTrackEvent",
+	:selector => "a",
+	:before => lambda{|el| el.attribute("onclick")},
+	:regexp => REGEXP[:new_event],
+	:val => lambda{|md| "id: #{md[1]}"}
+})
+spider.train(:old_pv ,{
+	:name => "OldTrackPageview",
+	:selector => "a",
+	:before => lambda{|el| el.attribute("onclick")},
+	:regexp => REGEXP[:old_pv],
+	:val => lambda{|md| "id: #{md[1]}"}
+})
+spider.train(:new_pv ,{
+	:name => "NewTrackPageview",
+	:selector => "a",
+	:before => lambda{|el| el.attribute("onclick")},
+	:regexp => REGEXP[:new_pv],
+	:val => lambda{|md| "id: #{md[1]}"}
+})
+spider.scan.show
+
 
 #		def find_tags
 #			r_ga_old = /(\[.*_setAccount.+(UA-\d+-\d+).+\])/i
