@@ -30,9 +30,11 @@ module Shikake
 			focus_crawl &set_focus
 			on_pages_like(%r{\.html?$}, %r{\.php$}, %r{/$}, &crawl)
 
-			@start_time = Time.now
+			@prof = Shikake::Profile.new
+			@prof.root_url = @root_url
+			@prof.start = Time.now
 			run
-			@end_time = Time.now
+			@prof.done = Time.now
 			@prof
 		end
 
@@ -41,7 +43,6 @@ module Shikake
 		end
 
 		def crawl
-			@prof = Shikake::Profile.new
 			lambda do |page|
 				@prof[page.url] = {
 					:title => page.doc.title,

@@ -1,5 +1,7 @@
 module Shikake
 	class Profile
+		attr_accessor :start, :done, :root_url
+
 		def initialize profile={}
 			@profile = profile
 		end
