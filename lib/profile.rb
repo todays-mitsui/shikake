@@ -50,6 +50,22 @@ module Shikake
 			@profile.map{|url,prof| prof[key]}.flatten.compact.uniq
 		end
 
+		#def find_all regexp
+		#	map do |url,prof|
+		#		
+		#	end
+		#end
+
+		#def find_helper regexp,hash
+		#	hash.inject({}) do |memo,(kind,val)|
+		#		if val.instance_of? Array
+		#			val.select!{|item| item.to_s.match(regexp)}
+		#			memo[] unless val.empty?
+		#		else
+		#			val.to_s
+		#	end
+		#end
+
 		def map(*args)
 			@profile.inject({}) do |memo,(url,prof)|
 				if args.empty?
@@ -58,7 +74,7 @@ module Shikake
 					key = args.first.to_sym
 					return memo unless prof.include? key
 					if block_given?
-						memo[url] = yield(prof[key]) 
+						memo[url] = yield(url,prof[key]) 
 					else
 						memo[url] = prof[key]
 					end

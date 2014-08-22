@@ -9,15 +9,15 @@ REGEXP = {
 	:univ => /(ga\s*\(\s*('create'|"create").*(UA-\d+-\d+).+;)/i
 }
 
-spider = Shikake::Spider.new("http://www.takakura-hotel.co.jp/banquet/")
-spider.train(:ga,{
+spider = Shikake::Spider.new("")
+spider.train(:ga ,{
 	:name => "GoogleAnalytics",
 	:selector => "script",
 	:before => lambda{|el| el.text},
 	:regexp => REGEXP[:ga],
 	:val => lambda{|md| "id: #{md[2]}"}
 })
-spider.train(:univ,{
+spider.train(:univ ,{
 	:name => "UniversalAnalytics",
 	:selector => "script",
 	:before => lambda{|el| el.text},
