@@ -44,6 +44,11 @@ class TestProfile < MiniTest::Unit::TestCase
 	end
 
 	def test_map_with_block
-		assert_equal true, ({"url/with/tags" => [1, 4], "url/with/links" => [4, 9]} == (@prof.map(:score) {|scores| scores.map {|score| score * score}}))
+		assert_equal true, ({"url/with/tags" => [1, 4], "url/with/links" => [4, 9]} == (@prof.map(:score) {|url,scores| scores.map {|score| score * score}}))
+	end
+
+	def test_find_all
+		p @prof.find_all /tag/
+		#assert @prof.find_all(/01/)
 	end
 end

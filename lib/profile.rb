@@ -50,21 +50,12 @@ module Shikake
 			@profile.map{|url,prof| prof[key]}.flatten.compact.uniq
 		end
 
-		#def find_all regexp
-		#	map do |url,prof|
-		#		
-		#	end
-		#end
-
-		#def find_helper regexp,hash
-		#	hash.inject({}) do |memo,(kind,val)|
-		#		if val.instance_of? Array
-		#			val.select!{|item| item.to_s.match(regexp)}
-		#			memo[] unless val.empty?
-		#		else
-		#			val.to_s
-		#	end
-		#end
+		def find_all regexp
+			prof = map do |url,prof|
+				find_helper(regexp, prof)
+			end
+			prof.select {|k,v| !(v.nil? || v.empty?)}
+		end
 
 		def map(*args)
 			@profile.inject({}) do |memo,(url,prof)|
@@ -82,5 +73,18 @@ module Shikake
 				memo
 			end
 		end
+
+		private
+
+			def find_helper regexp,prof
+				prof.map do |kind,val|
+					if val.instance_of? Array
+						val.select!{|item| item.to_s.match(regexp)}
+						val.empty? ? nil : val
+					else
+						val if val.to_s.match(regexp)
+					end
+				end.flatten.compact
+			end
 	end
 end
