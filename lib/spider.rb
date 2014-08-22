@@ -15,10 +15,15 @@ module Shikake
 			@regexp = []
 			@kinds = []
 			@blueprint = Hash.new
+
+			FileUtils.mkdir_p("tmp/") unless FileTest.exist?("tmp/")
 			@tmp_path = "tmp/tmp_#{(0...8).map{(65+rand(26)).chr}.join}.txt"
+
 			@opts.merge!({
 				:skip_query_strings => true,
-				:delay => 0.5,
+				:delay => 0.6,
+				:depth_limit => 8,
+				:read_timeout => 20,
 				:storage => Anemone::Storage.PStore(@tmp_path),
 				:verbose => true
 			})
