@@ -81,11 +81,11 @@ module Shikake
 			lambda do |page|
 				page.links.keep_if do |link|
 					href = link.to_s
-					@ignore_url.all? do |filter|
-						if filter[1]
-							href.match(filter[0])
+					@ignore_url.all? do |(regexp,reverse)|
+						if reverse
+							href.match(regexp)
 						else
-							!href.match(filter[0])
+							!href.match(regexp)
 						end
 					end
 				end
@@ -103,8 +103,8 @@ module Shikake
 				result = []
 				page.doc.css(selector).each do |el|
 					target = before_factory.call(el)
-					match_data = target.to_s.match(regexp) if target
-					result << after_factory.call(match_data) if match_data
+					val = target.to_s.match(regexp, &after_factory) if target
+					result << val if val
 				end
 				result
 			end
