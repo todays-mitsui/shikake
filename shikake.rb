@@ -108,7 +108,7 @@ spider.train(:ytm ,{
 	:val => lambda{|el,md| "id: #{md[1]}"}
 })
 
-spider.scan.show
+spider.scan.show.save
 
 
 #		def find_tags
