@@ -43,6 +43,7 @@ module Shikake
 			@prof.start = Time.now
 			run
 			@prof.done = Time.now
+			File.delete(@tmp_path) if FileTest.exist?(@tmp_path)
 			@prof
 		end
 
