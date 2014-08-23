@@ -9,8 +9,9 @@ module Shikake
 			super
 			@root_url = url
 			@ignore_url = [
-				[%r{(/img/|/upimg/)}i, false],
-				[%r{(\.jpe?g$|\.gif$|\.png$|\.pdf$)}i, false]
+				[%r{(/img/|/images?/|/upimg/)}i, false],
+				[%r{(\.jpe?g$|\.gif$|\.png$|\.pdf$)}i, false],
+				[%r|/\d{4}/\d{2}/|, false]
 			]
 			@regexp = []
 			@kinds = []
