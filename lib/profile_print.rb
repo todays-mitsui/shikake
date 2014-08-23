@@ -52,7 +52,7 @@ ids: #{values(tag_id)}
 					<<-EOS
 [#{tag_name}]が見つかったURL
 
-#{select(:tag_id).keys.join("\n")}
+#{select(tag_id).keys.join("\n")}
 
 ================================================================
 					EOS
@@ -60,7 +60,7 @@ ids: #{values(tag_id)}
 					<<-EOS
 [#{tag_name}]が見つからなかったURL
 
-#{reject(:tag_id).keys.join("\n")}
+#{reject(tag_id).keys.join("\n")}
 
 ================================================================
 					EOS
