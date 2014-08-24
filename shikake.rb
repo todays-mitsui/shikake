@@ -37,6 +37,13 @@ spider.train(:univ ,{
 	:regexp => REGEXP[:univ],
 	:val => lambda{|el,md| "id: #{md[3]}, displayfeatures: #{el.text.match(REGEXP[:disp_feat]) ? 'YES' : 'NO'}"}
 })
+spider.train(:ytm ,{
+	:name => "Yahoo!TagManager",
+	:selector => "script",
+	:before => lambda{|el| el.text},
+	:regexp => REGEXP[:ytm],
+	:val => lambda{|el,md| "id: #{md[1]}"}
+})
 spider.train(:old_event ,{
 	:name => "OldTrackEvent",
 	:selector => "a",
@@ -98,13 +105,6 @@ spider.train(:ydn_cv ,{
 	:selector => "script",
 	:before => lambda{|el| el.text},
 	:regexp => REGEXP[:ydn_cv],
-	:val => lambda{|el,md| "id: #{md[1]}"}
-})
-spider.train(:ytm ,{
-	:name => "Yahoo!TagManager",
-	:selector => "script",
-	:before => lambda{|el| el.text},
-	:regexp => REGEXP[:ytm],
 	:val => lambda{|el,md| "id: #{md[1]}"}
 })
 
