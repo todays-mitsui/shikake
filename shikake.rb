@@ -21,92 +21,97 @@ REGEXP = {
 	:ytm          => %r{"//s\.yjtag\.jp/tag\.js#(site=[^"]+)"},
 }
 
-spider = Shikake::Spider.new(ARGV[0])
+if ARGV[0].nil? || !%r{^https?://.+}.match(ARGV[0])
+	puts "スキャンするURLを指定してください。"
+else
+	spider = Shikake::Spider.new(ARGV[0])
 
-spider.train(:ga ,{
-	:name => "GoogleAnalytics",
-	:selector => "script",
-	:before => lambda{|el| el.text},
-	:regexp => REGEXP[:ga],
-	:val => lambda{|el,md| "id: #{md[2]}"}
-})
-spider.train(:univ ,{
-	:name => "UniversalAnalytics",
-	:selector => "script",
-	:before => lambda{|el| el.text},
-	:regexp => REGEXP[:univ],
-	:val => lambda{|el,md| "id: #{md[3]}, displayfeatures: #{el.text.match(REGEXP[:disp_feat]) ? 'YES' : 'NO'}"}
-})
-spider.train(:old_event ,{
-	:name => "OldTrackEvent",
-	:selector => "a",
-	:before => lambda{|el| el.attribute("onclick")},
-	:regexp => REGEXP[:old_event],
-	:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
-})
-spider.train(:new_event ,{
-	:name => "NewTrackEvent",
-	:selector => "a",
-	:before => lambda{|el| el.attribute("onclick")},
-	:regexp => REGEXP[:new_event],
-	:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
-})
-spider.train(:old_pv ,{
-	:name => "OldTrackPageview",
-	:selector => "a",
-	:before => lambda{|el| el.attribute("onclick")},
-	:regexp => REGEXP[:old_pv],
-	:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
-})
-spider.train(:new_pv ,{
-	:name => "NewTrackPageview",
-	:selector => "a",
-	:before => lambda{|el| el.attribute("onclick")},
-	:regexp => REGEXP[:new_pv],
-	:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
-})
-spider.train(:g_adwords_cv ,{
-	:name => "GoogleAdWordsConversion",
-	:selector => "script",
-	:before => lambda{|el| el.text},
-	:regexp => REGEXP[:g_adwords_cv],
-	:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"}
-})
-spider.train(:g_remarke ,{
-	:name => "GoogleAdWordsRemarketing",
-	:selector => "script",
-	:before => lambda{|el| el.text},
-	:regexp => REGEXP[:g_remarke],
-	:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"}
-})
-spider.train(:yss_cv ,{
-	:name => "YSS_Conversion",
-	:selector => "script",
-	:before => lambda{|el| el.text},
-	:regexp => REGEXP[:yss_cv],
-	:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"}
-})
-spider.train(:ydn_remarke ,{
-	:name => "YDN_Remarketing",
-	:selector => "script",
-	:before => lambda{|el| el.text},
-	:regexp => REGEXP[:ydn_remarke],
-	:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"}
-})
-spider.train(:ydn_cv ,{
-	:name => "YDN_Conversion",
-	:selector => "script",
-	:before => lambda{|el| el.text},
-	:regexp => REGEXP[:ydn_cv],
-	:val => lambda{|el,md| "id: #{md[1]}"}
-})
-spider.train(:ytm ,{
-	:name => "Yahoo!TagManager",
-	:selector => "script",
-	:before => lambda{|el| el.text},
-	:regexp => REGEXP[:ytm],
-	:val => lambda{|el,md| "id: #{md[1]}"}
-})
+	spider.train(:ga ,{
+		:name => "GoogleAnalytics",
+		:selector => "script",
+		:before => lambda{|el| el.text},
+		:regexp => REGEXP[:ga],
+		:val => lambda{|el,md| "id: #{md[2]}"}
+	})
+	spider.train(:univ ,{
+		:name => "UniversalAnalytics",
+		:selector => "script",
+		:before => lambda{|el| el.text},
+		:regexp => REGEXP[:univ],
+		:val => lambda{|el,md| "id: #{md[3]}, displayfeatures: #{el.text.match(REGEXP[:disp_feat]) ? 'YES' : 'NO'}"}
+	})
+	spider.train(:ytm ,{
+		:name => "Yahoo!TagManager",
+		:selector => "script",
+		:before => lambda{|el| el.text},
+		:regexp => REGEXP[:ytm],
+		:val => lambda{|el,md| "id: #{md[1]}"}
+	})
+	spider.train(:old_event ,{
+		:name => "OldTrackEvent",
+		:selector => "a",
+		:before => lambda{|el| el.attribute("onclick")},
+		:regexp => REGEXP[:old_event],
+		:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
+	})
+	spider.train(:new_event ,{
+		:name => "NewTrackEvent",
+		:selector => "a",
+		:before => lambda{|el| el.attribute("onclick")},
+		:regexp => REGEXP[:new_event],
+		:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
+	})
+	spider.train(:old_pv ,{
+		:name => "OldTrackPageview",
+		:selector => "a",
+		:before => lambda{|el| el.attribute("onclick")},
+		:regexp => REGEXP[:old_pv],
+		:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
+	})
+	spider.train(:new_pv ,{
+		:name => "NewTrackPageview",
+		:selector => "a",
+		:before => lambda{|el| el.attribute("onclick")},
+		:regexp => REGEXP[:new_pv],
+		:val => lambda{|el,md| "id: #{md[1]}, href: \"#{el.attribute("href")}\""}
+	})
+	spider.train(:g_adwords_cv ,{
+		:name => "GoogleAdWordsConversion",
+		:selector => "script",
+		:before => lambda{|el| el.text},
+		:regexp => REGEXP[:g_adwords_cv],
+		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"}
+	})
+	spider.train(:g_remarke ,{
+		:name => "GoogleAdWordsRemarketing",
+		:selector => "script",
+		:before => lambda{|el| el.text},
+		:regexp => REGEXP[:g_remarke],
+		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"}
+	})
+	spider.train(:yss_cv ,{
+		:name => "YSS_Conversion",
+		:selector => "script",
+		:before => lambda{|el| el.text},
+		:regexp => REGEXP[:yss_cv],
+		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"}
+	})
+	spider.train(:ydn_remarke ,{
+		:name => "YDN_Remarketing",
+		:selector => "script",
+		:before => lambda{|el| el.text},
+		:regexp => REGEXP[:ydn_remarke],
+		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"}
+	})
+	spider.train(:ydn_cv ,{
+		:name => "YDN_Conversion",
+		:selector => "script",
+		:before => lambda{|el| el.text},
+		:regexp => REGEXP[:ydn_cv],
+		:val => lambda{|el,md| "id: #{md[1]}"}
+	})
 
-spider.scan.show.save
+	spider.scan.show.save
+end
+
 

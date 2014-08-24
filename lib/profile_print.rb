@@ -13,7 +13,7 @@ module Shikake
 			File.open(filepath, "w+") do |file|
 				file.write common
 				file.write "\n"
-				file.write @kinds.map{|kind| print_url_list kind,(kind.first == :univ)}.join("\n")
+				file.write @kinds.map{|kind| print_url_list kind,(kind.first == :univ)}.join
 			end
 			puts <<-EOS
 #{File.expand_path(filepath)}
@@ -49,21 +49,29 @@ ids: #{values(tag_id)}
 			def print_url_list kind, reverse
 				tag_id, tag_name = kind
 				if !reverse
-					<<-EOS
+					urls = select(tag_id)
+					if !urls.empty?
+						<<-EOS
 [#{tag_name}]が見つかったURL
 
 #{select(tag_id).keys.join("\n")}
 
 ================================================================
-					EOS
+
+						EOS
+					end
 				else
-					<<-EOS
+					urls = reject(tag_id)
+					if !urls.empty?
+						<<-EOS
 [#{tag_name}]が見つからなかったURL
 
 #{reject(tag_id).keys.join("\n")}
 
 ================================================================
-					EOS
+
+						EOS
+					end
 				end
 			end
 	end

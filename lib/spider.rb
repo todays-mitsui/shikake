@@ -18,7 +18,7 @@ module Shikake
 			@blueprint = Hash.new
 
 			FileUtils.mkdir_p("tmp/") unless FileTest.exist?("tmp/")
-			@tmp_path = "tmp/tmp_#{(0...8).map{(65+rand(26)).chr}.join}.txt"
+			@tmp_path = "tmp/tmp_#{(0...8).map{(65+rand(26)).chr}.join}"
 
 			@opts.merge!({
 				:skip_query_strings => true,
