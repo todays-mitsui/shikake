@@ -12,8 +12,8 @@ module Shikake
 			filepath = "log/#{filename}[#{@start.strftime"%Y%m%d_%H%M%S"}].txt"
 			File.open(filepath, "w+") do |file|
 				file.write common
-				file.write "\n"
-				file.write @kinds.map{|kind| print_url_list kind,(kind.first == :univ)}.join
+				file.write "\n\n"
+				file.write @blueprint.map{|tag_id,attribute| print_url_list tag_id,attribute}.join
 			end
 			puts <<-EOS
 #{File.expand_path(filepath)}
@@ -33,45 +33,54 @@ module Shikake
 ルートURL:    #{@root_url}
 ページ数:     #{length} pages
 
-#{@kinds.map{|kind| print_dichotomize kind}.join("\n")}
+#{@blueprint.map{|tag_id,attribute| print_dichotomize tag_id, attribute}.join("\n")}
 				EOS
 			end
 
-			def print_dichotomize kind
-				tag_id, tag_name = kind
+			def print_dichotomize tag_id, attribute
 				<<-EOS
-[#{tag_name}] exists:  #{select(tag_id).length} pages
-[#{tag_name}] is none: #{reject(tag_id).length} pages
-ids: #{values(tag_id)}
+[#{attribute[:name]}]
+  見つかったページ:       #{select(tag_id).length} pages
+  見つからなかったページ: #{reject(tag_id).length} pages
+  ids: #{values(tag_id)}
 				EOS
 			end
 
-			def print_url_list kind, reverse
-				tag_id, tag_name = kind
-				if !reverse
-					urls = select(tag_id)
+			def print_url_list tag_id, attribute
+				if attribute[:required]
+					urls = reject(tag_id)
 					if !urls.empty?
 						<<-EOS
-[#{tag_name}]が見つかったURL
+[#{attribute[:name]}]が見つからなかったURL
 
-#{select(tag_id).keys.join("\n")}
+#{urls.keys.join("\n")}
 
 ================================================================
 
 						EOS
 					end
 				else
-					urls = reject(tag_id)
+					urls = select(tag_id)
 					if !urls.empty?
 						<<-EOS
-[#{tag_name}]が見つからなかったURL
+[#{attribute[:name]}]が見つかったURL
 
-#{reject(tag_id).keys.join("\n")}
+#{print_url_list_helper(urls, tag_id, attribute[:verbose]).join("\n")}
 
 ================================================================
 
 						EOS
 					end
+				end
+			end
+
+			def print_url_list_helper urls, tag_id, is_verbose
+				if is_verbose
+					urls.map do |url,value|
+						"#{url}\n#{value[tag_id]}\n"
+					end
+				else
+					urls.keys
 				end
 			end
 	end

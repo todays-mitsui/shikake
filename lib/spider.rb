@@ -38,7 +38,7 @@ module Shikake
 			on_pages_like(%r{\.html?$}, %r{\.php$}, %r{/$}, &crawl)
 
 			@prof = Shikake::Profile.new
-			@prof.kinds = @kinds
+			@prof.blueprint = @blueprint
 			@prof.root_url = @root_url
 			@prof.start = Time.now
 			run
@@ -48,18 +48,19 @@ module Shikake
 		end
 
 		def train tag_id, blueprint
-			@kinds << [tag_id.to_sym, blueprint[:name]] 
 			@blueprint[tag_id] = blueprint
 		end
 
 		def crawl
 			lambda do |page|
-				@prof[page.url] = {
-					:title => page.doc.title,
-					:links => page.links
-				}
-				@blueprint.keys.each do |kind|
-					@prof[page.url] = {kind => find_tags(kind, page)}
+				unless page.redirect_to
+					@prof[page.url] = {
+						:title => page.doc.title,
+						:links => page.links
+					}
+					@blueprint.keys.each do |kind|
+						@prof[page.url] = {kind => find_tags(kind, page)}
+					end
 				end
 			end
 		end
