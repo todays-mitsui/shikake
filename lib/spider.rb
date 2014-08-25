@@ -38,7 +38,7 @@ module Shikake
 			on_pages_like(%r{\.html?$}, %r{\.php$}, %r{/$}, &crawl)
 
 			@prof = Shikake::Profile.new
-			@prof.kinds = @kinds
+			@prof.blueprint = @blueprint
 			@prof.root_url = @root_url
 			@prof.start = Time.now
 			run
@@ -48,7 +48,6 @@ module Shikake
 		end
 
 		def train tag_id, blueprint
-			@kinds << [tag_id.to_sym, blueprint[:name]] 
 			@blueprint[tag_id] = blueprint
 		end
 
