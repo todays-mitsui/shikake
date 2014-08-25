@@ -1,5 +1,3 @@
-#! ruby -Ku
-
 require 'bundler'
 Bundler.require
 
