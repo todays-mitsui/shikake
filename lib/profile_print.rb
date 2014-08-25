@@ -39,9 +39,10 @@ module Shikake
 
 			def print_dichotomize tag_id, attribute
 				<<-EOS
-[#{attribute[:name]}] exists:  #{select(tag_id).length} pages
-[#{attribute[:name]}] is none: #{reject(tag_id).length} pages
-ids: #{values(tag_id)}
+[#{attribute[:name]}]
+  見つかったページ:       #{select(tag_id).length} pages
+  見つからなかったページ: #{reject(tag_id).length} pages
+  ids: #{values(tag_id)}
 				EOS
 			end
 

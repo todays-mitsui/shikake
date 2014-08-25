@@ -15,7 +15,7 @@ REGEXP = {
 	:old_event    => /_?gaq.push\(\s*(\[('_trackEvent'|"_trackEvent").*\])\s*\)/i,
 	:new_event    => /(ga\(('send'|"send").*,.*('event'|"event").*\))/i,
 	:old_pv       => /_?gaq.push\(\s*(\[('_trackPageview'|"_trackPageview").*\])\s*\)/i,
-	:new_pv       => /ga(\(('send'|"send").*,.*('pageview'|"pageview").*\))/i,
+	:new_pv       => /(ga\(('send'|"send").*,.*('pageview'|"pageview").*\))/i,
 	:g_adwords_cv => /google_conversion_id\s*=\s*(\d+).+google_conversion_label\s*=\s*["'](\w*)["'].+google_remarketing_only\s*=\s*false/im,
 	:g_remarke    => /google_conversion_id\s*=\s*(\d+).+google_conversion_label\s*=\s*["'](\w*)["'].+google_remarketing_only\s*=\s*true/im,
 	:yss_cv       => /yahoo_conversion_id\s*=\s*(\d+).+yahoo_conversion_label\s*=\s*["'](\w*)["']/im,
@@ -45,7 +45,7 @@ else
 		:required => true, # 必須項目?
 	})
 	spider.train(:ytm ,{
-		:name => "Yahoo!TagManager",
+		:name => "Yahoo!タグマネージャー",
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:ytm],
@@ -53,7 +53,7 @@ else
 		:required => true,
 	})
 	spider.train(:old_event ,{
-		:name => "OldTrackEvent",
+		:name => "旧TrackEvent",
 		:selector => "a",
 		:before => lambda{|el| el.attribute("onclick")},
 		:regexp => REGEXP[:old_event],
@@ -61,7 +61,7 @@ else
 		:verbose => true, # URLと共に値を出力する?
 	})
 	spider.train(:new_event ,{
-		:name => "NewTrackEvent",
+		:name => "新TrackEvent",
 		:selector => "a",
 		:before => lambda{|el| el.attribute("onclick")},
 		:regexp => REGEXP[:new_event],
@@ -69,7 +69,7 @@ else
 		:verbose => true,
 	})
 	spider.train(:old_pv ,{
-		:name => "OldTrackPageview",
+		:name => "旧CallCV",
 		:selector => "a",
 		:before => lambda{|el| el.attribute("onclick")},
 		:regexp => REGEXP[:old_pv],
@@ -77,7 +77,7 @@ else
 		:verbose => true,
 	})
 	spider.train(:new_pv ,{
-		:name => "NewTrackPageview",
+		:name => "新CallCV",
 		:selector => "a",
 		:before => lambda{|el| el.attribute("onclick")},
 		:regexp => REGEXP[:new_pv],
@@ -85,39 +85,39 @@ else
 		:verbose => true,
 	})
 	spider.train(:g_adwords_cv ,{
-		:name => "GoogleAdWordsConversion",
+		:name => "GoogleAdWordsコンバージョン",
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:g_adwords_cv],
 		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"},
 	})
 	spider.train(:g_remarke ,{
-		:name => "GoogleAdWordsRemarketing",
+		:name => "GoogleAdWordsリマケ",
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:g_remarke],
 		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"},
 	})
 	spider.train(:yss_cv ,{
-		:name => "YSS_Conversion",
+		:name => "Yahoo!スポンサードサーチ",
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:yss_cv],
 		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"},
 	})
-	spider.train(:ydn_remarke ,{
-		:name => "YDN_Remarketing",
-		:selector => "script",
-		:before => lambda{|el| el.text},
-		:regexp => REGEXP[:ydn_remarke],
-		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"},
-	})
 	spider.train(:ydn_cv ,{
-		:name => "YDN_Conversion",
+		:name => "YDNコンバージョン",
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:ydn_cv],
 		:val => lambda{|el,md| "id: #{md[1]}"},
+	})
+	spider.train(:ydn_remarke ,{
+		:name => "YDNリマケ",
+		:selector => "script",
+		:before => lambda{|el| el.text},
+		:regexp => REGEXP[:ydn_remarke],
+		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"},
 	})
 
 	spider.scan.show.save
