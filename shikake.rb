@@ -42,7 +42,7 @@ else
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:univ],
 		:val => lambda{|el,md| "id: #{md[3]}, displayfeatures: #{el.text.match(REGEXP[:disp_feat]) ? 'YES' : 'NO'}, linker: #{el.text.match(REGEXP[:allow_linker])[1]}"},
-		:required => true,
+		:required => true, # 必須項目?
 	})
 	spider.train(:ytm ,{
 		:name => "Yahoo!TagManager",
@@ -58,7 +58,7 @@ else
 		:before => lambda{|el| el.attribute("onclick")},
 		:regexp => REGEXP[:old_event],
 		:val => lambda{|el,md| "id: #{md[1]}, href: '#{el.attribute("href")}'"},
-		:verbose => true,
+		:verbose => true, # URLと共に値を出力する?
 	})
 	spider.train(:new_event ,{
 		:name => "NewTrackEvent",
