@@ -41,7 +41,7 @@ else
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:univ],
-		:val => lambda{|el,md| linker = el.text.match(REGEXP[:allow_linker]); "id: #{md[3]}, displayfeatures: #{el.text.match(REGEXP[:disp_feat]) ? 'YES' : 'NO'}, linker: #{linker ? '設定無し' : linker[1]}"},
+		:val => lambda{|el,md| linker = el.text.match(REGEXP[:allow_linker]); "id: #{md[3]}, displayfeatures: #{el.text.match(REGEXP[:disp_feat]) ? 'YES' : 'NO'}, linker: #{linker.nil? ? '設定無し' : linker[1]}"},
 		:required => true, # 必須項目?
 	})
 	spider.train(:ytm ,{
