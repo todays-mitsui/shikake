@@ -1,3 +1,5 @@
+#! ruby -Ku
+
 require 'bundler'
 Bundler.require
 
@@ -39,7 +41,7 @@ else
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:univ],
-		:val => lambda{|el,md| "id: #{md[3]}, displayfeatures: #{el.text.match(REGEXP[:disp_feat]) ? 'YES' : 'NO'}, linker: #{el.text.match(REGEXP[:allow_linker])[1]}"},
+		:val => lambda{|el,md| linker = el.text.match(REGEXP[:allow_linker]); "id: #{md[3]}, displayfeatures: #{el.text.match(REGEXP[:disp_feat]) ? 'YES' : 'NO'}, linker: #{linker.nil? ? '設定無し' : linker[1]}"},
 		:required => true, # 必須項目?
 	})
 	spider.train(:ytm ,{
@@ -87,21 +89,21 @@ else
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:g_adwords_cv],
-		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"},
+		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '設定無し' : md[2]}"},
 	})
 	spider.train(:g_remarke ,{
 		:name => "GoogleAdWordsリマケ",
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:g_remarke],
-		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"},
+		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '設定無し' : md[2]}"},
 	})
 	spider.train(:yss_cv ,{
 		:name => "Yahoo!スポンサードサーチ",
 		:selector => "script",
 		:before => lambda{|el| el.text},
 		:regexp => REGEXP[:yss_cv],
-		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '無し' : md[2]}"},
+		:val => lambda{|el,md| "id: #{md[1]}, label: #{md[2].empty? ? '設定無し' : md[2]}"},
 	})
 	spider.train(:ydn_cv ,{
 		:name => "YDNコンバージョン",
