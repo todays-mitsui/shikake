@@ -54,12 +54,15 @@ module Shikake
 		def crawl
 			lambda do |page|
 				unless page.redirect_to
-					@prof[page.url] = {
-						:title => page.doc.title,
-						:links => page.links
-					}
-					@blueprint.keys.each do |kind|
-						@prof[page.url] = {kind => find_tags(kind, page)}
+					begin
+						@prof[page.url] = {
+							:title => page.doc.title,
+							:links => page.links
+						}
+						@blueprint.keys.each do |kind|
+							@prof[page.url] = {kind => find_tags(kind, page)}
+						end
+					rescue
 					end
 				end
 			end

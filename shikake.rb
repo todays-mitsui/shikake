@@ -29,6 +29,14 @@ if ARGV[0].nil? || !%r{^https?://.+}.match(ARGV[0])
 else
 	spider = Shikake::Spider.new(ARGV[0])
 
+#	spider.train(:AnalyticsJS ,{
+#		:name => "analytics.js",
+#		:selector => "script",
+#		:before => lambda{|el| el.attribute("src")},
+#		:regexp => %r{js/analytics.js},
+#		:val => lambda{|el,md| ""},
+#		:required => true, # 必須項目?
+#	})
 	spider.train(:ga ,{
 		:name => "GoogleAnalytics",
 		:selector => "script",
